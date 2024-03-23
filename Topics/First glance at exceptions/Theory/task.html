@@ -1,0 +1,66 @@
+<h2>First glance at exceptions</h2>
+<div class="step-text">
+<p>Some <a class="theory-lookup" href="/learn/step/3536" rel="noopener noreferrer nofollow" target="_blank" title="In Java, an error is a type of exception that indicates a problem has occurred during the execution of a program. | It is a runtime exception, meaning it occurs while the program is running, and it interrupts the normal flow of the program. Errors are typically caused by issues outside the control of the program, such as running out of memory or a network connection being lost. They are usually not recoverable and result in the termination of the program. Understanding errors is essential for debugging and handling unexpected situations in Java programs.">errors</a> in your code do not prevent the program from running and, in this case, the program will only crash while trying to execute a "broken" line: a line with an error called an <strong><a class="theory-lookup" href="/learn/step/15639" rel="noopener noreferrer nofollow" target="_blank" title="An exception in Java is an object that indicates an error or exceptional condition has occurred during the execution of a program. | These objects are instances of classes that are part of a class hierarchy rooted at the base class Throwable. When an exception is thrown, the Java runtime system attempts to find a suitable handler for it, which can be located in the same method where the exception occurred or in a calling method. If a suitable handler is found and executed, the exception is considered handled and the program can continue running normally.">exception</a></strong>. Thus, exceptions are the errors detected during the program <strong>execution</strong> (at runtime), whereas <a class="theory-lookup" href="/learn/step/3521" rel="noopener noreferrer nofollow" target="_blank" title="Syntax in Java refers to the set of rules that define how a program needs to be written in order to be valid. | It includes specific keywords that have special meanings in the programming language, which cannot be used as variable names in your own program. Identifiers or names are words that refer to something in a program, such as a variable or a function name. Comments are textual explanations of what the code does, starting with a semicolon. Whitespace includes all characters that are not visible, such as spaces, tabs, and newlines.">syntax</a> errors are those detected during <strong>compiling</strong> the program into byte-code. An exception interrupts the normal <a class="theory-lookup" href="/learn/step/10982" rel="noopener noreferrer nofollow" target="_blank" title="Execution in Java refers to the process of running a program or method. | It involves the interpretation and execution of code by the Java Virtual Machine (JVM). Execution can involve both primitive and reference types, and it often involves the use of methods with return types and parameters. The execution of a program follows a specific order, determined by the call stack, which keeps track of method invocations and their corresponding information. The result of execution is typically the output or processing of data, depending on the logic implemented in the code.">execution</a> of a program.</p><p>Let's consider two types of exceptions and how to avoid them.</p><h5 id="arithmeticexception">ArithmeticException</h5><p>Suppose you are writing a program that reads two integers from the standard input and then outputs the result of the integer <a class="theory-lookup" href="/learn/step/3517" rel="noopener noreferrer nofollow" target="_blank" title="Division in Java is a mathematical operation that determines the number of times a divisor can be subtracted from a dividend until the dividend becomes zero or negative. | It is a binary operator that takes two operands, and the result is the integer part of the quotient when both operands are integers. The modulus or remainder operator returns the remainder of the division of two numbers. Division with floating-point numbers can produce inaccurate results due to the accumulation of errors during computation.">division</a> of the first number by the second one. Take a look at the code below.</p><pre><code class="language-java">import java.util.Scanner;
+
+public class ArithmeticExceptionDemo {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        int a = scanner.nextInt();
+        int b = scanner.nextInt();
+
+        System.out.println(a / b); // an exception is possible here!
+        System.out.println("finished");
+    }
+}</code></pre><p>If the user passes <code class="language-java">9</code> and <code class="language-java">3</code> as the input values, the program outputs <code class="language-java">3</code> as well as the <code class="language-java">"finished"</code> string. But if the second number is <code class="language-java">0</code>, the program throws an exception because of the division by zero, and the <code class="language-java">"finished"</code> string is not printed at all.</p><pre><code class="language-no-highlight">Exception in thread "main" java.lang.ArithmeticException: / by zero
+  at ArithmeticExceptionDemo.main(ArithmeticExceptionDemo.java:11)</code></pre><p>All the code <strong>before</strong> the exception is executed properly, and everything <strong>after </strong>is not.</p><p>The displayed message shows the cause of the exception (<code class="language-java">"/ by zero"</code>), the file and the line number where it has occurred (<code class="language-java">ArithmeticExceptionDemo.java:11</code>). The provided information is useful for developers, but it is not very meaningful for the end-users of the program.</p><p>To avoid the exception, we can check the value before the division, and, if the value is zero, print a message. Here is another version of the program: If the second number is zero, the program will print the "<strong>Division by zero!</strong>" string.</p><pre><code class="language-java">import java.util.Scanner;
+
+public class ArithmeticExceptionDemo {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        int a = scanner.nextInt();
+        int b = scanner.nextInt();
+
+        if (b == 0) {
+            System.out.println("Division by zero!");
+        } else {
+            System.out.println(a / b);
+        }
+        System.out.println("finished");
+    }
+}</code></pre><p>Look at an input example. Let's try to input zero as a divider:</p><pre><code class="language-java">3 0</code></pre><p>The result is:</p><pre><code class="language-java">Division by zero!
+finished</code></pre><p>As you can see, the new version of the program does not throw an exception and always successfully finishes. Additionally, it <a class="theory-lookup" href="/learn/step/13775" rel="noopener noreferrer nofollow" target="_blank" title="In Java, 'print' is a statement used to display output to the console. | It writes the specified text or variable value to the standard output stream, which is typically the console. Unlike 'println', 'print' does not add a newline character after the output, meaning that subsequent print statements will continue writing on the same line. It's a fundamental tool for providing feedback and displaying results in a Java program.">prints</a> a user-friendly message instead of the standard message.</p><h5 id="numberformatexception">NumberFormatException</h5><p>Another situation to consider is when you are trying to convert a string into an <a class="theory-lookup" href="/learn/step/3565" rel="noopener noreferrer nofollow" target="_blank" title="In Java, an integer number is a type of primitive data type that represents whole numbers, both positive and negative, as well as zero. | The most commonly used integer types are byte, short, int, and long, with int being the default type. These types can store numbers within specific ranges, with int being able to store numbers between -2,147,483,648 and 2,147,483,647.">integer number</a>: If the string has an unsuitable format, the code will throw an exception.</p><p>The following program reads a line from the standard input and then outputs the number that follows it.</p><pre><code class="language-java">import java.util.Scanner;
+
+public class NumberFormatExceptionDemo {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+
+        int number = Integer.parseInt(input); // an exception is possible here!
+        System.out.println(number + 1);
+    }
+}</code></pre><p>It works pretty well if the input line is a correct integer number, but if the input is not correct (e.g. <code class="language-java">"121a"</code>), the program will fail:</p><pre><code class="language-no-highlight">Exception in thread "main" java.lang.NumberFormatException: For input string: "121a"
+  at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
+  at java.base/java.lang.Integer.parseInt(Integer.java:652)
+  at java.base/java.lang.Integer.parseInt(Integer.java:770)
+  at NumberFormatExceptionDemo.main(NumberFormatExceptionDemo.java:9)</code></pre><p>This message displays the type of exception (<code class="language-java">NumberFormatException</code>) and the passed input string. The place where the exception occurred is shown in the last line of the message:</p><ul><li><p>the filename is <code class="language-java">NumberFormatExceptionDemo.java</code>;</p></li><li><p>the <code class="language-java">main</code> method;</p></li><li><p>the line 9.</p></li></ul><p>All the previous lines of the message show the positions inside the <code class="language-java">parseInt</code> method that is part of the standard library.</p><p>To avoid this exception, it is possible to check the input string by using a <a class="theory-lookup" href="/learn/step/3670" rel="noopener noreferrer nofollow" target="_blank" title="A regular expression in Java is a sequence of characters that specifies a set of strings and is used to search, edit, and manipulate text. | Java has built-in support for regular expressions, with the String class having a special method called matches() that takes a regular expression pattern as an argument and checks whether the string matches this pattern. Regular expressions can contain both regular characters and special characters with specific meanings, allowing for the definition of common patterns.">regular expression</a>. In case the input is not correct, we can output a warning message:</p><pre><code class="language-java">import java.util.Scanner;
+
+public class NumberFormatExceptionDemo {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+
+        if (input.matches("\\d+")) { // it checks if the input line contains only digits
+            int number = Integer.parseInt(input);
+            System.out.println(number + 1);
+        } else {
+            System.out.println("Incorrect number: " + input);
+        }
+    }
+}</code></pre><p>If the input line is "121a", the program will not stop, and it will print the message:</p><pre><code class="language-java">Incorrect number: 121a</code></pre><p> </p><p></p><div class="alert alert-primary"><p>Don't worry if you don't know regular expressions yet. Just remember this trick.</p></div><p></p><h5 id="conclusion">Conclusion</h5><ul><li><p>Exceptions do not prevent a program from being compiled and run, but the program crashes as soon as the line with an exception is being executed.</p></li><li><p>There are many types of exceptions, and you will learn more about them in the following topics.</p></li><li><p>You can use control statements to avoid some kinds of exceptions (like <code class="language-java">ArithmeticException</code> or <code class="language-java">NumberFormatException</code>) in your programs.</p></li><li><p>There is a general approach to handle exceptions and even <a class="theory-lookup" href="/learn/step/3553" rel="noopener noreferrer nofollow" target="_blank" title="The 'throw' keyword in Java is used to throw an exception manually at any point during the execution of a program. | It is used in conjunction with an object of a class that extends the Throwable class, which is the superclass of all exception classes in Java. The throw statement consists of the keyword 'throw' followed by the object to be thrown. It is typically used when a method's preconditions are broken and it cannot be performed under the current conditions.">throw</a> them by yourself that you will learn in the next lesson.</p></li></ul>
+</div>
